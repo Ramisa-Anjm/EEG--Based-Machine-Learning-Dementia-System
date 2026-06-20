@@ -11,13 +11,12 @@ from scipy import stats
 from sklearn.model_selection import permutation_test_score
 from scipy.signal import welch
 
-# --------- patch: ignore broken EEGLAB events ----------
+# --------- ignore broken EEGLAB events ----------
 def _dummy_annotations_eeglab(fname, uint16_codec=None):
     from mne import Annotations
     return Annotations([], [], [])
 
 eeglab._read_annotations_eeglab = _dummy_annotations_eeglab
-# -------------------------------------------------------
 
 def process_single_subject(events_file, eeg_file, subject_id, task_name):
     """
@@ -56,7 +55,7 @@ def process_single_subject(events_file, eeg_file, subject_id, task_name):
     # Balance classes
     n = min(len(targets), len(nontargets))
     if n == 0:
-        print(f"  ⚠️  WARNING: No valid trials for subject {subject_id}, skipping...")
+        print(f"WARNING: No valid trials for subject {subject_id}, skipping...")
         return None, None, None
     
     print(f"  Balanced to: {n} per class")
@@ -104,7 +103,7 @@ def process_single_subject(events_file, eeg_file, subject_id, task_name):
     sfreq = epochs.info['sfreq']
 
 # Get epoch data and normalize
-    epoch_data = epochs.get_data()[:, ch_idx, :]  # (n_trials, n_times)
+    epoch_data = epochs.get_data()[:, ch_idx, :]  
     subject_mean = np.mean(epoch_data)
     subject_std = np.std(epoch_data)
     normalized_data = (epoch_data - subject_mean) / (subject_std + 1e-8)  # NOW DEFINED
@@ -122,7 +121,7 @@ def process_single_subject(events_file, eeg_file, subject_id, task_name):
         comod.fit(trial)
         pac_features.append(np.mean(comod.comod_))
 
-# Theta power features (NEW - added right here)
+# Theta power features 
     theta_powers = []
     for trial in epoch_data:  # Use original non-normalized data
         freqs, psd = welch(trial, fs=sfreq, nperseg=256)
@@ -174,14 +173,11 @@ def load_all_subjects(subjects, task_name="SART"):
     
     return X_combined, y_combined, all_groups
 
-
-
 # Define all subjects
 subjects = ["001", "002", "003", "004", "005", "006", "007"]
 
 # Load all data
 X, y, groups = load_all_subjects(subjects, task_name="SART")
-
 
 print(f"\n{'='*50}")
 print("TRAINING OPTIONS")
@@ -205,8 +201,8 @@ print(f"AUC: {auc:.3f}")
 print("\nClassification Report:")
 print(classification_report(y_test, y_pred, target_names=['Non-target', 'Target']))
 
-# Option 2: Leave-One-Subject-Out Cross-Validation (RECOMMENDED)
-print(f"\n--- Option 2: Leave-One-Subject-Out Cross-Validation (RECOMMENDED) ---")
+#Leave-One-Subject-Out Cross-Validation
+print(f"\n--- Leave-One-Subject-Out Cross-Validation---")
 logo = LeaveOneGroupOut()
 clf_cv = RandomForestClassifier(n_estimators=100, random_state=42)
 
@@ -233,8 +229,6 @@ elif mean_auc > 0.5:
     print(" WEAK: Slight difference, may not generalize well")
 else:
     print("RANDOM: No detectable difference or poor generalization")
-
-
     
 target_pac = X[y == 1, 0]  # First feature, target trials
 nontarget_pac = X[y == 0, 0]  # First feature, non-target trials
@@ -253,7 +247,7 @@ pooled_std = np.sqrt(((len(target_pac)-1)*target_pac.var() + (len(nontarget_pac)
 cohens_d = (target_pac.mean() - nontarget_pac.mean()) / pooled_std
 print(f"   Cohen's d = {cohens_d:.3f}")
 
-# 3. Mann-Whitney U (non-parametric)
+# 3. Mann-Whitney U 
 u_stat, p_mw = stats.mannwhitneyu(target_pac, nontarget_pac, alternative='two-sided')
 print(f"\n2. MANN-WHITNEY U TEST:")
 print(f"   U = {u_stat:.1f}, p = {p_mw:.4f}")
