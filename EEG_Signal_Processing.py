@@ -7,10 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mne.preprocessing import ICA
 
-
-# --------------------
 # LOAD DATA
-# --------------------
 fname = "sub-007_ses-pre_task-SART_eeg.set"
 mat = spio.loadmat(fname, struct_as_record=False, squeeze_me=True)
 
@@ -49,16 +46,15 @@ chans = [cl.labels for cl in chanlocs]
 info = mne.create_info(chans, srate, ch_types='eeg')
 raw = mne.io.RawArray(data, info)
 
-# SET MONTAGE (CRITICAL FOR ICA TOPOGRAPHIES)
+# SET MONTAGE 
 montage = mne.channels.make_standard_montage("standard_1020")
 raw.set_montage(montage, match_case=False, on_missing="ignore")
 
 # FILTERING (DATA ALREADY HP=1 Hz, SO WE DON'T TOUCH LOW FREQ)
-
 raw.filter(l_freq=None, h_freq=40)
 raw.notch_filter(freqs=60)
 
-# ICA PREP DATA (COPY + 1 Hz HP)
+# ICA PREP DATA 
 raw_for_ica = raw.copy().filter(l_freq=1., h_freq=None)
 
 ica = ICA(
@@ -68,15 +64,6 @@ ica = ICA(
 )
 
 ica.fit(raw)
-#ica.exclude = [17, 16, 15, 8, 4, 1]
-
-# --------------------
-# PLOT ICA COMPONENTS (SCALP MAPS)
-# --------------------
-#raw.plot(duration=10, n_channels=32, scalings=dict(eeg=20e-6))
-#plt.show(block=True)
-
-#raw.save("sart_clean_raw.fif", overwrite=True)
 
 eog_inds, scores = ica.find_bads_eog(raw, ch_name='Fp1')
 ica.exclude = eog_inds
