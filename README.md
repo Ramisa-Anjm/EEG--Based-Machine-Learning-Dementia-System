@@ -1,14 +1,13 @@
 Overview:
-This project investigates whether neural oscillatory interactions, measured through Phase-Amplitude Coupling (PAC), 
-can be used to decode cognitive states from EEG recordings. By extracting PAC features from event-related EEG epochs 
-and training a Random Forest classifier, the model attempts to distinguish between different cognitive conditions 
-based on underlying neural activity.
+This project investigates whether neural oscillatory interactions, quantified through Phase-Amplitude Coupling (PAC), can be used to decode cognitive states from electroencephalography (EEG) recordings.
 
-The project combines neuroscience signal processing techniques with machine learning to explore how patterns of 
-brain activity can be translated into predictive models.
+PAC features are extracted from event-related EEG epochs and used to train a Random Forest classifier capable of distinguishing between different cognitive conditions based on underlying patterns of neural activity. The project combines neuroscience signal processing techniques with machine learning to explore how brain activity can be translated into predictive models.
+
+Research Question:
+Can Phase-Amplitude Coupling (PAC) features extracted from EEG recordings be used to accurately classify cognitive states associated with attentional performance?
 
 Data Description: 
-The data consists of EEG recordings collected from participants performing the Sustained Attention to Response Task (SART). SART is a cognitive task used to measure attention and response inhibition. Participants are shown a sequence of numbers between 1 and 9 and must respond to every stimulus except for a designated target (in this case, the number 3). Markers identifying errors on target trials and reaction time patterns are used to assess lapses in attention and cognitive control. 
+The dataset consists of EEG recordings collected during the Sustained Attention to Response Task (SART), a widely used paradigm for measuring sustained attention and response inhibition. During the task, participants are presented with a sequence of numbers (1–9) and are instructed to respond to every stimulus except a designated target number (3). Behavioural markers such as errors on target trials are used to identify differences in attentional state and cognitive control.
 
 Methodology:
 1. EEG Preprocessing: The raw EEG data underwent several preprocessing steps: Bandpass filtering, removal of powerline noise, Independent Component Analysis (ICA) for artifact removal, identification and removal of noisy channels and signal normalization.
